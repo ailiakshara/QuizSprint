@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuizSprint</title>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+      }
+      .quiz-container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .option {
+        display: block;
+        margin: 10px;
+        padding: 12px;
+        cursor: pointer;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        transition: 0.3s;
+        font-size: 16px;
+        background: #f9f9f9;
+      }
+      .option:hover {
+        background: #e0e0e0;
+      }
+      .correct {
+        background-color: lightgreen !important;
+        border-color: green !important;
+      }
+      .wrong {
+        background-color: lightcoral !important;
+        border-color: red !important;
+      }
+      .hidden {
+        display: none;
+      }
+      button {
+        margin: 10px;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.3s;
+      }
+      #restart-btn {
+        background: #ffcc00;
+      }
+      #retry-btn {
+        background: #007bff;
+        color: white;
+      }
+      #next-btn {
+        background: #28a745;
+        color: white;
+      }
+      button:hover {
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="quiz-container">
+      <h1>QuizSprint</h1>
+      <div id="question-container"></div>
+      <button id="next-btn" onclick="nextQuestion()">Next</button>
+      <button id="restart-btn" onclick="restartQuiz()" class="hidden">
+        Restart Quiz
+      </button>
+      <button id="retry-btn" onclick="startQuiz()" class="hidden">Retry</button>
+    </div>
+    <script>
+      const allQuestions = [
+        {
+          question: "What is the worst-case time complexity of QuickSort?",
+          options: ["O(n log n)", "O(n^2)", "O(n)", "O(log n)"],
+          answer: 1,
+        },
+        {
+          question: "Which data structure is used in Dijkstra's algorithm?",
+          options: ["Stack", "Queue", "Priority Queue", "Graph"],
+          answer: 2,
+        },
+        {
+          question: "Which sorting algorithm is best for nearly sorted data?",
+          options: ["Quick Sort", "Heap Sort", "Bubble Sort", "Insertion Sort"],
+          answer: 3,
+        },
+        {
+          question: "What is the auxiliary space complexity of Merge Sort?",
+          options: ["O(n)", "O(1)", "O(n log n)", "O(n^2)"],
+          answer: 0,
+        },
+        {
+          question: "Which algorithm is used to detect cycles in a graph?",
+          options: [
+            "Dijkstra's Algorithm",
+            "Floyd-Warshall",
+            "DFS with Backtracking",
+            "Kruskal’s Algorithm",
+          ],
+          answer: 2,
+        },
+        {
+          question:
+            "Which hashing technique handles collisions using chaining?",
+          options: [
+            "Linear Probing",
+            "Quadratic Probing",
+            "Separate Chaining",
+            "Double Hashing",
+          ],
+          answer: 2,
+        },
+        {
+          question: "Which data structure is used for implementing BFS?",
+          options: ["Stack", "Queue", "Heap", "Priority Queue"],
+          answer: 1,
+        },
+        {
+          question:
+            "What is the average-case complexity of Hash Table operations?",
+          options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+          answer: 0,
+        },
+        {
+          question: "Which tree is balanced and self-adjusting?",
+          options: ["Binary Search Tree", "AVL Tree", "Heap", "Trie"],
+          answer: 1,
+        },
+        {
+          question:
+            "Which algorithm is used in Kruskal’s algorithm to find MST?",
+          options: [
+            "DFS",
+            "Union-Find",
+            "Dijkstra’s Algorithm",
+            "Bellman-Ford",
+          ],
+          answer: 1,
+        },
+      ];
+
+      let currentQuestions = [],
+        currentIndex = 0,
+        score = 0;
+      const questionContainer = document.getElementById("question-container");
+      const nextBtn = document.getElementById("next-btn");
+      const restartBtn = document.getElementById("restart-btn");
+      const retryBtn = document.getElementById("retry-btn");
+
+      function startQuiz() {
+        currentQuestions = allQuestions
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 10);
+        currentIndex = 0;
+        score = 0;
+        restartBtn.classList.remove("hidden");
+        retryBtn.classList.add("hidden");
+        nextBtn.classList.remove("hidden");
+        loadQuestion();
+      }
+
+      function restartQuiz() {
+        currentIndex = 0;
+        score = 0;
+        nextBtn.classList.remove("hidden");
+        retryBtn.classList.add("hidden");
+        loadQuestion();
+      }
+
+      function loadQuestion() {
+        if (currentIndex >= currentQuestions.length) {
+          questionContainer.innerHTML = `<h2>Your Score: ${score}/10</h2>`;
+          restartBtn.classList.add("hidden");
+          retryBtn.classList.remove("hidden");
+          nextBtn.classList.add("hidden");
+          return;
+        }
+
+        const q = currentQuestions[currentIndex];
+        questionContainer.innerHTML =
+          `<h3>${q.question}</h3>` +
+          q.options
+            .map(
+              (opt, i) =>
+                `<div class='option' onclick='checkAnswer(${i})'>${opt}</div>`
+            )
+            .join("");
+      }
+
+      function checkAnswer(selected) {
+        const q = currentQuestions[currentIndex];
+        const options = document.querySelectorAll(".option");
+        options.forEach((opt, i) => {
+          if (i === q.answer) opt.classList.add("correct");
+          if (i === selected && i !== q.answer) opt.classList.add("wrong");
+        });
+        if (selected === q.answer) score++;
+      }
+
+      function nextQuestion() {
+        currentIndex++;
+        loadQuestion();
+      }
+
+      startQuiz();
+    </script>
+  </body>
+</html>
